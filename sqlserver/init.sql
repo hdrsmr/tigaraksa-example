@@ -19,13 +19,5 @@ BEGIN
 END
 GO
 
-IF NOT EXISTS (SELECT 1 FROM dbo.customer)
-BEGIN
-    INSERT INTO dbo.customer (name, email)
-    VALUES
-        ('Budi', 'budi@gmail.com'),
-        ('Andi', 'andi@gmail.com'),
-        ('Citra', 'citra@gmail.com'),
-        ('Deni', 'deni@gmail.com');
-END
+
 GO
