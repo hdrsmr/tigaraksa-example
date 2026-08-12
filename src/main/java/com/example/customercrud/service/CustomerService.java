@@ -31,8 +31,7 @@ public class CustomerService {
         this.customerListCache = hazelcastInstance.getMap("customer-list-cache");
     }
 
-    public List<Customer> getAllCustomers() {
-
+    public List<Customer> getAllCustomersHazel() {
 
         List<Customer> list = customerListCache.get("allData");
         if (list != null && !list.isEmpty()) {
@@ -40,16 +39,12 @@ public class CustomerService {
             return list;
         }
 
+        return null;
+    }
 
-        list = customerRepository.findAll();
-
-        if (list == null || list.isEmpty()) {
-            log.info("data Tidak ada di Database");
-            return null;
-
-        }
-
-        log.info("getAll data From Database");
+    public void insertHazel() {
+        log.info("getAll data From Database, Insert To Hazelcast");
+        List<Customer> list = customerRepository.findAll();
         customerListCache.put(
                 "allData",
                 list,
@@ -57,12 +52,16 @@ public class CustomerService {
                 TimeUnit.MINUTES
         );
 
+
+    }
+
+    public List<Customer> getAllCustomers() {
+        List<Customer> list = customerRepository.findAll();
         return list;
     }
 
 
     public Optional<Customer> getCustomerById(Integer id) {
-        log.info("Fetching customer by id: {}", id);
 
         // 1. Cek Hazelcast
         Customer customer = customerCache.get(id);
@@ -84,42 +83,32 @@ public class CustomerService {
         log.info("GET customer FROM DATABASE {}", customer);
 
         // 3. Simpan ke Hazelcast selama 5 menit
-        saveCustomerCache(customer,0);
+        saveCustomerCache(customer);
 
         return Optional.of(customer);
     }
 
     public Customer createCustomer(Customer customer) {
         customer.setCreatedAt(LocalDateTime.now());
-        log.info("Creating new customer: {}", customer);
-
         Customer custom = customerRepository.save(customer);
 
         if (custom.getId() != null) {
-            saveCustomerCache(custom,0);
+            saveCustomerCache(custom);
         }
 
 
         return custom;
     }
 
-    private void saveCustomerCache(Customer customer, int mode) {
-
+    private void saveCustomerCache(Customer customer) {
         log.info("Save Customer {} To Hazelcast", customer.getName());
+        customerCache.put(
+                customer.getId(),
+                customer,
+                5,
+                TimeUnit.MINUTES
+        );
 
-        if (mode==0){
-            customerCache.put(
-                    customer.getId(),
-                    customer,
-                    5,
-                    TimeUnit.MINUTES
-            );
-        }else{
-            customerCache.replace(
-                    customer.getId(),
-                    customer
-            );
-        }
 
     }
 
@@ -129,7 +118,7 @@ public class CustomerService {
                     customer.setName(customerDetails.getName());
                     log.info("Updating customer with id: {}", id);
                     Customer cus = customerRepository.save(customer);
-                    saveCustomerCache(cus,1);
+                    saveCustomerCache(cus);
                     return cus;
                 })
                 .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));

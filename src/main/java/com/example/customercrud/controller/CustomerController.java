@@ -29,19 +29,43 @@ public class CustomerController {
 
     private final CustomerService customerService;
 
-    @GetMapping
+
+    @GetMapping("/testInsertHazel")
+    public void test() {
+
+        long startTime = System.nanoTime();
+        customerService.insertHazel();
+        long endTime = System.nanoTime();
+        double durationMs = (endTime - startTime) / 1_000_000.0;
+        log.info("Get InsertHazel membutuhkan waktu: {} ms", durationMs);
+    }
+
+    @GetMapping("/getAllFromDB")
     @Operation(summary = "Get all customers")
     public ResponseEntity<List<Customer>> getAllCustomers() {
-
         long startTime = System.currentTimeMillis();
         List<Customer> datas = customerService.getAllCustomers();
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
-        log.info("Get all customers membutuhkan waktu: {} ms", duration);
+        log.info("Get all customers DB membutuhkan waktu: {} ms", duration);
+
+        return ResponseEntity.ok(datas);
+    }
+
+
+    @GetMapping("/getAllFromHazelCast")
+    @Operation(summary = "Get all customers Hazelcast")
+    public ResponseEntity<List<Customer>> getAllCustomersHazel() {
+        long startTime = System.currentTimeMillis();
+        List<Customer> datas = customerService.getAllCustomersHazel();
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+        log.info("Get all customers HAZELCAST membutuhkan waktu: {} ms", duration);
 
 
         return ResponseEntity.ok(datas);
     }
+
 
     @GetMapping("/{id}")
     @Operation(summary = "Get customer by id")
