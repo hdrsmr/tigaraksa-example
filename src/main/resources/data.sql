@@ -5,7 +5,7 @@ WITH numbers AS (
     UNION ALL
     SELECT n + 1
     FROM numbers
-    WHERE n < 100000
+    WHERE n < 10000
 )
 INSERT INTO customer (name, email, created_at)
 SELECT CONCAT('nama_', n),
