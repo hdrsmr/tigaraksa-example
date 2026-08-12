@@ -31,6 +31,9 @@ public class Customer {
     @Column(name = "name", length = 100)
     private String name;
 
-    @Column(name = "created_date")
-    private LocalDateTime createdDate;
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 }

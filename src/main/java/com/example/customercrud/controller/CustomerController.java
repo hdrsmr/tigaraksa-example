@@ -5,6 +5,8 @@ import com.example.customercrud.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,6 +24,7 @@ import java.util.List;
 @RequestMapping("/api/customers")
 @RequiredArgsConstructor
 @Tag(name = "Customer", description = "Customer CRUD operations")
+@Log4j2
 public class CustomerController {
 
     private final CustomerService customerService;
@@ -29,7 +32,15 @@ public class CustomerController {
     @GetMapping
     @Operation(summary = "Get all customers")
     public ResponseEntity<List<Customer>> getAllCustomers() {
-        return ResponseEntity.ok(customerService.getAllCustomers());
+
+        long startTime = System.currentTimeMillis();
+        List<Customer> datas = customerService.getAllCustomers();
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+        log.info("Get all customers membutuhkan waktu: {} ms", duration);
+
+
+        return ResponseEntity.ok(datas);
     }
 
     @GetMapping("/{id}")

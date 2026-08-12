@@ -10,6 +10,6 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
-        return new OpenAPI().info(new Info().title("Tigaraksa API Example"));
+        return new OpenAPI().info(new Info().title("Ogya API Example"));
     }
 }
